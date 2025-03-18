@@ -1,25 +1,20 @@
 # Ile kto spędza najwięcej czasu w jakim dniu
 # losowe korelacje
+from .events import client_event_declaration
+from .commands import client_tree_commands_declaration
 import discord
 import logging
+from discord.ext import commands
 from config.settings import TOKEN
 intents = discord.Intents.default()
 intents.voice_states = True
-handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+handler = logging.FileHandler(
+    filename='discord.log', encoding='utf-8', mode='w')
 
-client = discord.Client(intents=intents)
-
-@client.event
-async def on_ready():
-    print(f'We have logged in as {client.user}')
-
-@client.event
-async def on_voice_state_update(member,before,after):
-    print(f'member: {member}')
-    print(f'before: {before.channel}')
-    print(f'after: {after}')
+bot = commands.Bot(command_prefix='!', intents=intents)
+client_event_declaration(bot)
+client_tree_commands_declaration(bot)
 
 
 def run_bot():
-    client.run(TOKEN,log_handler=handler)
-    
+    bot.run(TOKEN, log_handler=handler)

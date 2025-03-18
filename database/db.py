@@ -9,4 +9,5 @@ def connect_db():
         print(f"Błąd z mongo DB : {e}")
         return False
     
-connect_db()
+if __name__ == "__main__":
+    connect_db()
