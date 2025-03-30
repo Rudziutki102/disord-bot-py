@@ -9,3 +9,4 @@ class User(Document):
     discord_avatar = URLField(required=True)
     is_online = BooleanField(default=False)
     discord_id = IntField(required=True)
+    meta = {'collection': 'bot-users'}
