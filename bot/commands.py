@@ -46,16 +46,18 @@ def client_tree_commands_declaration(bot: commands.Bot):
     @bot.tree.command(name='track_users')
     @app_commands.describe(discord_user='Select user to add to DB', name="How you want to name the user")
     async def hello(interaction: discord.Interaction, discord_user: discord.Member, name: str):
+        print(discord_user.voice)
         if any(role.id in allowed_roles for role in interaction.user.roles):
             user = User(
                 name=name,
                 discord_name=discord_user.name,
                 discord_avatar=discord_user.avatar.url if discord_user.avatar else None,
-                is_online=bool(discord_user.voice.channel),
+                is_online=bool(
+                    discord_user.voice.channel) if discord_user.voice else None,
                 discord_id=discord_user.id
             )
+            user.save()
             try:
-                await user.save()
                 await interaction.response.send_message(f'You added {discord_user} as a {name}', ephemeral=True)
             except Exception as e:
                 print(f"Error saving user: {e}")
