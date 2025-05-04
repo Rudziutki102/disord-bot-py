@@ -17,8 +17,7 @@ class VoiceActivity(Document):
     username = StringField(required=True)
     channel_id = IntField(required=True)
     channel_name = StringField(required=True)
-    joined_at = StringField(required=True)
-    left_at = StringField(default=None)
-    shared_users = ListField(anything=True, default=[])
+    joined_at = DateTimeField(required=True)
+    left_at = DateTimeField(default=None)
     session_duration = FloatField(default=0)
     meta = {'collection': 'voice-activity'}

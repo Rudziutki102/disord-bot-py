@@ -1,5 +1,5 @@
 .env
 /bot-env
 __pycache__
+bot-env
 discord.log
-requirements.txt
