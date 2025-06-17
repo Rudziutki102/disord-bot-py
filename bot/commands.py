@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from config.settings import ALLOWED_ROLES
-from database.models import User, VoiceActivity
+from database.models import Channel, User, VoiceActivity
 import calendar
 import traceback
 import xlsxwriter
@@ -13,7 +13,24 @@ allowed_roles: list[int] = list(map(int, ALLOWED_ROLES))
 
 
 def client_tree_commands_declaration(bot: commands.Bot):
-    @bot.tree.command(name="generate_report", description="Generates raport for current month, then returns csv")
+    @bot.tree.command(name="create_channels_list", description="In case the data is not updated automatically")
+    async def create_channels_list(interaction: discord.Interaction):
+        channels = interaction.guild.voice_channels
+
+        for channel in channels:
+            channel: Channel = Channel(
+                channel_id=str(channel.id),
+                name=channel.name,
+                created_at=channel.created_at
+            )
+            try:
+                channel.save()
+            except Exception as error:
+                print(error)
+                await interaction.response.send_message(f'Nastąpił błąd przy zapisie kanałów głosowych do bazy danych')
+        await interaction.response.send_message(f'Lista kanałów została zaktualizowana w bazie danych ')
+
+    @bot.tree.command(name="generate_report", description="Generates raport  for current month, then returns csv")
     async def generate_raport(interaction: discord.Interaction):
         now = datetime.now()
         year = now.year
@@ -54,7 +71,7 @@ def client_tree_commands_declaration(bot: commands.Bot):
                 discord_avatar=discord_user.avatar.url if discord_user.avatar else None,
                 is_online=bool(
                     discord_user.voice.channel) if discord_user.voice else None,
-                discord_id=discord_user.id
+                discord_id=str(discord_user.id)
             )
             user.save()
             try:
