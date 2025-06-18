@@ -33,7 +33,7 @@ def client_event_declaration(bot):
                     voice_activity.save()
                 except Exception as e:
                     logger.exception('błąd', e)
-            else:
+            elif before.channel and not after.channel:
                 current_voice_activity = VoiceActivity.objects(
                     user_id=user.discord_id, left_at=None).first()
                 delta = (now - current_voice_activity.joined_at).total_seconds()/60
@@ -43,3 +43,26 @@ def client_event_declaration(bot):
                         session_duration=round(delta, 2))
                 except Exception as e:
                     logger.exception('błąd', e)
+            else:
+                current_voice_activity = VoiceActivity.objects(
+                    user_id=user.discord_id, left_at=None).first()
+                delta = (now - current_voice_activity.joined_at).total_seconds()/60
+                if str(after.channel.id) in CHANNELS_WITHOUT_TRACKING:
+                    try:
+                        current_voice_activity.update(
+                            left_at=now,
+                            session_duration=round(delta, 2))
+                    except Exception as e:
+                        logger.exception('błąd', e)
+                else:
+                    current_voice_activity.update(
+                        left_at=now,
+                        session_duration=round(delta, 2))
+                    voice_activity = VoiceActivity(
+                        user_id=str(user.discord_id),
+                        username=user.name,
+                        channel_id=str(after.channel.id),
+                        channel_name=after.channel.name,
+                        joined_at=now,
+                    )
+                    voice_activity.save()
